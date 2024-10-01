@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ziyaretçi Sayacı</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 1s ease;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+        }
+        #visitorCount {
+            font-size: 48px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hoş Geldiniz!</h1>
+        <p>Şu anda <span id="visitorCount">0</span> ziyaretçi var.</p>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script>
+        const socket = io();
+        const visitorCountElement = document.getElementById('visitorCount');
+        let currentCount = 0;
+
+        function animateBackgroundColor(newColor) {
+            anime({
+                targets: 'body',
+                backgroundColor: newColor,
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            });
+        }
+
+        function animateCounter(newCount) {
+            anime({
+                targets: visitorCountElement,
+                innerHTML: [currentCount, newCount],
+                round: 1,
+                duration: 1000,
+                easing: 'easeInOutExpo'
+            });
+            currentCount = newCount;
+        }
+
+        socket.on('visitorUpdate', (data) => {
+            if (data.count !== currentCount) {
+                animateBackgroundColor(data.color);
+                animateCounter(data.count);
+            }
+        });
+    </script>
+</body>
+</html>
